@@ -1,3 +1,5 @@
+// Give the portal a stable browser browsing-context name for reuse.
+window.name = 'hrcomp_erp_portal';
 import {groups, destinations} from './menu-config.js'
 const root=document.querySelector('#groups')
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
