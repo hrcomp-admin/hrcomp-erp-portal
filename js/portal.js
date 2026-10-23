@@ -14,8 +14,11 @@ for(const group of groups){
   el.disabled=!enabled;el.setAttribute('aria-label',enabled?`${name} 실행`:`${name} WEB 준비 중`)
   el.innerHTML=`<span class="item-label">${escapeHtml(name)}</span><span class="status">${enabled?'열기 ↗':'준비 중'}</span>`
   if(enabled)el.addEventListener('click',()=>{
-   // PC·모바일 공통: 포털은 유지하고 업무 모듈을 새 탭에서 실행.
-   window.open(config.url,'_blank','noopener,noreferrer')
+   // 업무별 고정된 탭 이름으로 기존 탭 재사용을 우선 시도.
+   // noopener 옵션은 named target 재사용을 방해하므로 지정하지 않는다.
+   const tabName='hrcomp_erp_'+key.replace(/[^a-zA-Z0-9_]/g,'_')
+   const tab=window.open(config.url,tabName)
+   if(tab)tab.focus()
   })
   list.append(el)
  }
