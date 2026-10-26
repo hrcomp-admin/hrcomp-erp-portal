@@ -15,5 +15,5 @@ export const destinations = {
  delivery: { url:'https://hrcomp-admin.github.io/hrcomp-delivery-pages/', enabled:true },
  // 기존 모바일 저장소의 GitHub Pages 주소 확인 후 활성화하세요.
  stock: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=stock', enabled:true },
- count: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=count', enabled:true },
+ // count: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=count', enabled:true },
 }
