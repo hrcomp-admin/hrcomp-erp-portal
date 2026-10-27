@@ -2,5 +2,16 @@
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#123d63"><title>HR COMP | WEB ERP</title><link rel="stylesheet" href="./css/portal.css"></head>
 <body>
 <header class="top"><div class="top-inner"><div class="brand"><span class="eyebrow">HR COMP</span><h1>ERP 메뉴</h1></div><div class="top-right"><span id="portalUser" class="user-info" aria-live="polite">사용자 정보 미연결</span></div></div></header>
-<main><div class="toolbar"><span class="toolbar-label">업무 선택</span><div class="legend" aria-label="메뉴 상태"><span class="dot"></span> 사용 가능 <span class="dot off"></span> 준비 중</div></div><div id="groups" class="groups"></div></main>
-<script type="module" src="./js/portal.js"></script></body></html>
+<main><div class="toolbar"><span class="toolbar-label">업무 선택</span><div class="legend" aria-label="메뉴 상태"><span class="dot"></span> 사용 가능 <span class="dot off"></span> 준비 중</div></div><div id="groups" class="groups"><p id="menuLoading" class="menu-notice">업무 메뉴를 불러오는 중입니다...</p></div></main>
+<script>
+// 모듈 스크립트가 로드되지 않은 경우에도 빈 화면 대신 오류를 표시합니다.
+window.addEventListener('error', function (event) {
+  const loading = document.getElementById('menuLoading');
+  if (loading) loading.textContent = '메뉴를 불러오지 못했습니다. 새로고침 후에도 동일하면 배포 파일(js/portal.js, js/menu-config.js)을 확인하십시오.';
+});
+setTimeout(function () {
+  const loading = document.getElementById('menuLoading');
+  if (loading) loading.textContent = '메뉴 로딩이 지연되고 있습니다. Ctrl+F5로 새로고침하거나 배포 파일을 확인하십시오.';
+}, 6000);
+</script>
+<script type="module" src="./js/portal.js?v=20261027-fix1"></script></body></html>

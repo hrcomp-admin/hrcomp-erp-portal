@@ -1,7 +1,22 @@
 // Give the portal a stable browser browsing-context name for reuse.
 window.name = 'hrcomp_erp_portal';
-import {groups, destinations} from './menu-config.js'
+// 배포 경로 및 브라우저 캐시 불일치에 대비하여 동적으로 설정을 로드합니다.
+let groups, destinations
+try {
+  const config = await import('./menu-config.js?v=20261027-fix1')
+  groups = config.groups
+  destinations = config.destinations
+  if (!Array.isArray(groups) || !destinations || typeof destinations !== 'object') {
+    throw new Error('메뉴 설정 형식이 올바르지 않습니다.')
+  }
+} catch (error) {
+  const root = document.querySelector('#groups')
+  if (root) root.innerHTML = '<p class="menu-notice menu-error">메뉴 설정을 불러오지 못했습니다. js/menu-config.js 파일의 배포 여부를 확인하십시오.</p>'
+  console.error('[ERP Portal] menu-config.js load failed:', error)
+  throw error
+}
 const root=document.querySelector('#groups')
+root.replaceChildren()
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 // 사용자 정보는 인증 연계 전까지 임의의 이름을 표시하지 않습니다.
 // 향후 검증된 인증 모듈에서 window.hrcompPortalSetUser(name)을 호출할 수 있습니다.
