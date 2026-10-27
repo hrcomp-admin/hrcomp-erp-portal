@@ -1,0 +1,11 @@
+HR COMP ERP 포털 4열 통합 수정본
+
+반드시 아래 4개 파일을 한 번에 교체하세요 (기존 GitHub 저장소 기준).
+- /index.html
+- /css/portal.css
+- /js/portal.js
+- /js/menu-config.js  (원본과 동일, 확인용 포함)
+
+기존 README.md는 변경하지 않아도 됩니다.
+배포 후 Ctrl+F5. PC 가로폭 1100px 초과에서 4열, 801~1100px에서 3열, 551~800px에서 2열, 그 이하 1열.
+현재 사용자 정보는 인증 연결 전이므로 표시만 합니다.
