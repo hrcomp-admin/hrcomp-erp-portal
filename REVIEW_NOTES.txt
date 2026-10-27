@@ -1,0 +1,8 @@
+원본: hrcomp-erp-portal-main(3).zip (최초 정상 작동 소스)
+변경: index.html, css/portal.css ONLY
+무변경: js/portal.js, js/menu-config.js (원본과 바이트 단위 동일)
+
+주의: 메뉴 렌더링의 정확한 배포 실패 원인은 콘솔 로그 없이는 확정 불가.
+업로드 시 ZIP 내부의 index.html, css/, js/를 저장소 루트에 그대로 배치.
+배포 후 Ctrl+F5. 개발자 도구 콘솔 오류 확인.
+사용자명은 현재 인증 연계가 없어 '사용자 정보 미연결' 유지.
