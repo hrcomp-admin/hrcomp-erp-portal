@@ -1,17 +1,84 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#123d63"><title>HR COMP | WEB ERP</title><link rel="stylesheet" href="./css/portal.css"></head>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#123d63"><title>HR COMP | WEB ERP</title><link rel="stylesheet" href="./css/portal.css?v=20261027-recovery2"></head>
 <body>
-<header class="top"><div class="top-inner"><div class="brand"><span class="eyebrow">HR COMP</span><h1>ERP 메뉴</h1></div><div class="top-right"><span id="portalUser" class="user-info" aria-live="polite">사용자 정보 미연결</span></div></div></header>
-<main><div class="toolbar"><span class="toolbar-label">업무 선택</span><div class="legend" aria-label="메뉴 상태"><span class="dot"></span> 사용 가능 <span class="dot off"></span> 준비 중</div></div><div id="groups" class="groups"><p id="menuLoading" class="menu-notice">업무 메뉴를 불러오는 중입니다...</p></div></main>
+<header class="top"><div class="top-inner"><div class="brand"><span class="eyebrow">HR COMP</span><h1>ERP 메뉴</h1></div><div class="top-right"><span id="portalUser" class="user-info">사용자 정보 미연결</span></div></div></header>
+<main><div class="toolbar"><span class="toolbar-label">업무 선택</span><div class="legend" aria-label="메뉴 상태"><span class="dot"></span> 사용 가능 <span class="dot off"></span> 준비 중</div></div><div id="groups" class="groups"></div></main>
 <script>
-// 모듈 스크립트가 로드되지 않은 경우에도 빈 화면 대신 오류를 표시합니다.
-window.addEventListener('error', function (event) {
-  const loading = document.getElementById('menuLoading');
-  if (loading) loading.textContent = '메뉴를 불러오지 못했습니다. 새로고침 후에도 동일하면 배포 파일(js/portal.js, js/menu-config.js)을 확인하십시오.';
-});
-setTimeout(function () {
-  const loading = document.getElementById('menuLoading');
-  if (loading) loading.textContent = '메뉴 로딩이 지연되고 있습니다. Ctrl+F5로 새로고침하거나 배포 파일을 확인하십시오.';
-}, 6000);
-</script>
-<script type="module" src="./js/portal.js?v=20261027-fix1"></script></body></html>
+// WEB ERP 포털 메뉴 설정: 새 모듈 추가 시 이 파일의 URL과 enabled를 설정합니다.
+// 기존 VBA 메뉴 23개를 포함합니다. 로그인/접근권한은 각 모듈에서 별도 검증합니다.
+const groups = [
+ {name:'영업관리', icon:'▤', items:[['고객주문','order'],['고객주문납기관리','delivery'],['출하관리','shipment'],['거래명세서','note']]},
+ {name:'재고관리', icon:'◫', items:[['현재재고','stock'],['재고실사','count']]},
+ {name:'구매관리', icon:'▣', items:[['구매발주','purchase'],['구매입고','purchase-in']]},
+ {name:'대금·마감', icon:'₩', items:[['세금계산서','tax'],['대금수금','receipt'],['미수금','receivable'],['월마감','close']]},
+ {name:'기준정보', icon:'▦', items:[['공통코드','common'],['사원','employee'],['고객사','customer'],['구매처','vendor'],['부품','part'],['단가관리','price']]},
+ {name:'운영·경영', icon:'◈', items:[['일정관리','schedule'],['품질관리','quality'],['DASHBOARD','dashboard']]},
+ {name:'시스템관리', icon:'⚙', items:[['비번','password'],['권한','auth']]},
+]
+const destinations = {
+ customer: { url:'https://hrcomp-admin.github.io/hrcomp-customer-pages/', enabled:true },
+ part: { url:'https://hrcomp-admin.github.io/hrcomp-part-pages/', enabled:true },
+ price: { url:'https://hrcomp-admin.github.io/hrcomp-price-pages/', enabled:true },  
+ order: { url:'https://hrcomp-admin.github.io/hrcomp-customer-order-pages/', enabled:true }, 
+ delivery: { url:'https://hrcomp-admin.github.io/hrcomp-delivery-pages/', enabled:true },
+ // 기존 모바일 저장소의 GitHub Pages 주소 확인 후 활성화하세요.
+ stock: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=stock', enabled:true },
+ // count: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=count', enabled:true },
+}
+
+
+(function () {
+  'use strict';
+  // 기본 메뉴는 HTML에 내장: 외부 JS 파일이 누락되어도 화면이 비지 않습니다.
+  const fallbackGroups = groups;
+  const fallbackDestinations = destinations;
+  const root = document.getElementById('groups');
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function render(menuGroups, menuDestinations) {
+    if (!Array.isArray(menuGroups) || !menuDestinations || typeof menuDestinations !== 'object') return;
+    const fragment = document.createDocumentFragment();
+    for (const group of menuGroups) {
+      const section = document.createElement('section');
+      section.className = 'group';
+      const heading = document.createElement('h3');
+      heading.textContent = group.name;
+      section.appendChild(heading);
+      const list = document.createElement('div');
+      list.className = 'items';
+      for (const [name, key] of group.items) {
+        const destination = menuDestinations[key];
+        const enabled = Boolean(destination && destination.enabled && destination.url);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'item ' + (enabled ? 'active' : 'disabled');
+        button.disabled = !enabled;
+        button.setAttribute('aria-label', enabled ? name + ' 실행' : name + ' WEB 준비 중');
+        button.innerHTML = '<span class="item-label">' + escapeHtml(name) + '</span><span class="status">' + (enabled ? '열기 ↗' : '준비 중') + '</span>';
+        if (enabled) button.addEventListener('click', function () {
+          const tabName = 'hrcomp_erp_' + key.replace(/[^a-zA-Z0-9_]/g, '_');
+          const tab = window.open(destination.url, tabName);
+          if (tab) tab.focus();
+        });
+        list.appendChild(button);
+      }
+      section.appendChild(list);
+      fragment.appendChild(section);
+    }
+    root.replaceChildren(fragment);
+  }
+  window.name = 'hrcomp_erp_portal';
+  window.hrcompPortalSetUser = function (name) {
+    const el = document.getElementById('portalUser');
+    if (el) el.textContent = typeof name === 'string' && name.trim() ? name.trim() + ' 님' : '사용자 정보 미연결';
+  };
+  render(fallbackGroups, fallbackDestinations);
+  // 설정 파일이 정상 배포되면 최신 메뉴 설정을 우선 적용합니다.
+  // 파일 로딩 실패 시에도 위 기본 메뉴는 계속 유지됩니다.
+  import('./js/menu-config.js?v=20261027-recovery2').then(config => {
+    if (Array.isArray(config.groups) && config.destinations && typeof config.destinations === 'object') {
+      render(config.groups, config.destinations);
+    }
+  }).catch(error => console.warn('[ERP Portal] 외부 메뉴 설정 로딩 실패: 내장 메뉴로 표시합니다.', error));
+})();
+
+</script></body></html>
