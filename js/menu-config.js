@@ -10,9 +10,10 @@ export const groups = [
  {name:'시스템관리', icon:'⚙', items:[['비번','password'],['권한','auth']]},
 ]
 export const destinations = {
- order: { url:'https://hrcomp-admin.github.io/hrcomp-customer-order-pages/', enabled:true },
+ customer: { url:'https://hrcomp-admin.github.io/hrcomp-customer-pages/', enabled:true },
  part: { url:'https://hrcomp-admin.github.io/hrcomp-part-pages/', enabled:true },
- price: { url:'https://hrcomp-admin.github.io/hrcomp-price-pages/', enabled:true },
+ price: { url:'https://hrcomp-admin.github.io/hrcomp-price-pages/', enabled:true },  
+ order: { url:'https://hrcomp-admin.github.io/hrcomp-customer-order-pages/', enabled:true }, 
  delivery: { url:'https://hrcomp-admin.github.io/hrcomp-delivery-pages/', enabled:true },
  // 기존 모바일 저장소의 GitHub Pages 주소 확인 후 활성화하세요.
  stock: { url:'https://hr-comp.github.io/hrcomp-mobile/?menu=stock', enabled:true },
