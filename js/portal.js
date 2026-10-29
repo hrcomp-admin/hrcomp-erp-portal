@@ -42,6 +42,7 @@ function showLogin(message = '') {
         <label for="login-password">비밀번호</label>
         <input id="login-password" type="password" autocomplete="current-password" required>
         <button type="submit" id="login-button">로그인</button>
+        <div class="password-entry"><a href="./password.html?mode=reset">비밀번호관리</a></div>
         <div id="login-message" role="alert"></div>
       </form>
     </div>`
