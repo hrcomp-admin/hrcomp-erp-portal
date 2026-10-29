@@ -56,7 +56,12 @@ function setPassword(mode) {
       const { error } = await client.auth.updateUser({ password })
       if (error) throw error
       document.querySelector('#password-form').reset()
-      message('비밀번호가 저장되었습니다. 포털로 돌아가 로그인하십시오.')
+      // 저장 성공 후에는 인증 세션을 종료하고 포털 로그인으로 복귀합니다.
+      // 로그아웃 실패가 이미 완료된 비밀번호 저장을 실패로 표시하지 않도록 분리합니다.
+      const { error: signOutError } = await client.auth.signOut()
+      if (signOutError) console.error('Password sign out:', signOutError)
+      window.alert('비밀번호가 정상적으로 저장되었습니다.\n새 비밀번호로 다시 로그인하십시오.')
+      window.location.replace('./index.html')
     } catch (err) { console.error('Password update:', err); message('비밀번호 저장에 실패했습니다. 인증 상태를 확인하십시오.', true) }
     finally { button.disabled = false }
   })
