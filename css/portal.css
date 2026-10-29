@@ -19,3 +19,12 @@
 .top-inner h1{margin:2px 0 3px}
 .top-inner{min-height:82px}
 @media(max-width:700px){.top-inner{min-height:unset;padding:12px 16px;flex-wrap:wrap}.top-right{flex-wrap:wrap;gap:8px}}
+
+.password-entry{display:flex;justify-content:flex-end;margin-top:12px;font-size:13px}
+.password-entry a{color:#155b93;text-decoration:none}.password-entry a:hover{text-decoration:underline}
+.password-card{max-width:490px}.password-card .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.password-card .actions button,.password-card .actions a{font:inherit;font-size:13px;padding:10px 14px;border-radius:6px;border:1px solid #bdc9d6;background:white;color:#123d63;text-decoration:none;cursor:pointer}
+.password-card .actions button.primary{background:#245f9e;color:white;border-color:#245f9e}
+.password-card .actions button:disabled{opacity:.5;cursor:not-allowed}
+.password-card .message{font-size:13px;line-height:1.6;min-height:20px;margin-top:14px;color:#245f9e;overflow-wrap:anywhere}
+.password-card .message.error{color:#b02a2a}
