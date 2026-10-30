@@ -51,9 +51,9 @@ function showPasswordSuccess(mode) {
   const portalLink = document.querySelector('#password-portal-link')
   if (portalLink) portalLink.hidden = true
   if (mode === 'recovery') {
-    frame('비밀번호 재설정 완료', '<p>새 비밀번호가 정상적으로 등록되었습니다.</p><p><strong>현재 비밀번호관리 창을 닫아 주세요.</strong></p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 로그인하십시오.</p>')
+    frame('비밀번호 재설정 완료', '<p>새 비밀번호가 정상적으로 등록되었습니다.</p><p class="password-close-notice">현재 비밀번호관리 창을 닫아 주세요.</p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 로그인하십시오.</p>')
   } else {
-    frame('비밀번호 변경 완료', '<p>비밀번호가 정상적으로 변경되었습니다.</p><p><strong>현재 비밀번호관리 창을 닫아 주세요.</strong></p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 다시 로그인하십시오.</p>')
+    frame('비밀번호 변경 완료', '<p>비밀번호가 정상적으로 변경되었습니다.</p><p class="password-close-notice">현재 비밀번호관리 창을 닫아 주세요.</p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 다시 로그인하십시오.</p>')
   }
 }
 function setPassword(mode) {
