@@ -6,6 +6,10 @@ const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 })
 const panel = document.querySelector('#password-panel')
 const params = new URLSearchParams(location.search)
+// 재설정 메일에서 직접 열린 탭만 복구 이벤트를 처리합니다.
+// 다른 탭의 비밀번호관리 화면이 복구 입력 화면으로 바뀌는 현상을 방지합니다.
+const recoveryLinkAtLoad = params.has('code') || params.get('type') === 'recovery' ||
+  (location.hash.includes('type=recovery') && location.hash.includes('access_token='))
 let recovery = false
 let completed = false
 
@@ -47,9 +51,9 @@ function showPasswordSuccess(mode) {
   const portalLink = document.querySelector('#password-portal-link')
   if (portalLink) portalLink.hidden = true
   if (mode === 'recovery') {
-    frame('비밀번호 재설정 완료', '<p><strong>새 비밀번호가 정상적으로 등록되었습니다.</strong></p><p>로그인 화면으로 돌아가 사번과 새 비밀번호로 로그인하십시오.</p><div class="actions"><a class="primary" href="./index.html">로그인 화면으로</a></div>')
+    frame('비밀번호 재설정 완료', '<p>새 비밀번호가 정상적으로 등록되었습니다.</p><p><strong>현재 비밀번호관리 창을 닫아 주세요.</strong></p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 로그인하십시오.</p>')
   } else {
-    frame('비밀번호 변경 완료', '<p><strong>비밀번호가 정상적으로 변경되었습니다.</strong></p><p>현재 창을 닫고 기존 포털에서 사번과 새 비밀번호로 다시 로그인하십시오.</p><div class="actions"><a href="./index.html">로그인 화면으로</a></div>')
+    frame('비밀번호 변경 완료', '<p>비밀번호가 정상적으로 변경되었습니다.</p><p><strong>현재 비밀번호관리 창을 닫아 주세요.</strong></p><p>기존 WEB ERP 포털에서 사번과 새 비밀번호로 다시 로그인하십시오.</p>')
   }
 }
 function setPassword(mode) {
@@ -90,7 +94,7 @@ async function start() {
   // 초기화 중 PASSWORD_RECOVERY 이벤트를 수신합니다.
   if (mode !== 'change') resetRequest()
   client.auth.onAuthStateChange((event) => {
-    if (event === 'PASSWORD_RECOVERY' && !completed && mode !== 'change') {
+    if (event === 'PASSWORD_RECOVERY' && recoveryLinkAtLoad && !completed && mode !== 'change') {
       recovery = true
       clearRecoveryUrl()
       setPassword('recovery')
@@ -102,7 +106,7 @@ async function start() {
     setPassword('change'); return
   }
   // 인증 링크가 이미 처리되어 PASSWORD_RECOVERY 이벤트가 앞서 발생한 경우 대비
-  if (location.hash.includes('type=recovery') || params.get('type') === 'recovery') {
+  if (recoveryLinkAtLoad) {
     const { data: { session } } = await client.auth.getSession()
     if (session && !completed) { recovery = true; clearRecoveryUrl(); setPassword('recovery') }
   }
