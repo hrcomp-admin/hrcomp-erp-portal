@@ -1,6 +1,19 @@
 // HR COMP WEB ERP 통합 포털 V2 — Supabase Auth + DB 메뉴
 // 기존 업무별 고정 탭 이름을 유지합니다.
 window.name = 'hrcomp_erp_portal'
+// 비밀번호관리의 복귀 요청에만 응답합니다. 메뉴 실행/탭 관리에는 영향이 없습니다.
+if (typeof BroadcastChannel !== 'undefined') {
+  const portalReturnChannel = new BroadcastChannel('hrcomp_erp_portal_return')
+  portalReturnChannel.onmessage = event => {
+    const { type, requestId } = event.data || {}
+    if (!requestId) return
+    if (type === 'FIND_PORTAL') {
+      portalReturnChannel.postMessage({ type: 'PORTAL_PRESENT', requestId })
+    } else if (type === 'FOCUS_PORTAL') {
+      window.focus() // 브라우저 정책에 따라 탭 활성화가 제한될 수 있습니다.
+    }
+  }
+}
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './supabase-config.js'
 

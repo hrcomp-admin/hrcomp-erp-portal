@@ -33,6 +33,41 @@ function resetRequest() {
     } finally { button.disabled = false }
   })
 }
+// 기존 포털 탭이 열려 있으면 그 탭에 복귀 요청을 전달합니다.
+// 브라우저에서 탭 전환/닫기를 제한할 수 있으므로 완료 화면을 대안으로 유지합니다.
+async function returnToPortal() {
+  if (typeof BroadcastChannel === 'undefined') {
+    window.location.replace('./index.html')
+    return
+  }
+  const channel = new BroadcastChannel('hrcomp_erp_portal_return')
+  const requestId = (globalThis.crypto?.randomUUID?.() || `${Date.now()}_${Math.random()}`)
+  let settled = false
+  const found = await new Promise(resolve => {
+    const timer = setTimeout(() => { if (!settled) { settled = true; resolve(false) } }, 700)
+    channel.onmessage = event => {
+      if (event.data?.type === 'PORTAL_PRESENT' && event.data?.requestId === requestId && !settled) {
+        settled = true
+        clearTimeout(timer)
+        resolve(true)
+      }
+    }
+    channel.postMessage({ type: 'FIND_PORTAL', requestId })
+  })
+  if (!found) {
+    channel.close()
+    window.location.replace('./index.html')
+    return
+  }
+  channel.postMessage({ type: 'FOCUS_PORTAL', requestId })
+  channel.close()
+  frame('비밀번호 변경 완료', '<p>비밀번호가 저장되었습니다. 이미 열려 있는 포털 탭에서 새 비밀번호로 로그인하십시오.</p><div class="actions"><button class="primary" type="button" id="close-password-tab">이 탭 닫기</button></div>')
+  document.querySelector('#close-password-tab').addEventListener('click', () => {
+    window.close()
+    // 이메일 링크 등으로 직접 열린 탭은 브라우저가 닫기를 허용하지 않을 수 있습니다.
+    setTimeout(() => message('탭이 닫히지 않으면 기존 포털 탭으로 이동한 후 이 탭을 닫아 주십시오.'), 150)
+  })
+}
 function setPassword(mode) {
   frame(mode === 'recovery' ? '새 비밀번호 등록' : '비밀번호 변경', `<p>${mode === 'recovery' ? '이메일 인증이 완료되었습니다.' : '현재 비밀번호를 확인한 뒤 변경합니다.'}</p><form id="password-form">${mode === 'change' ? '<label for="current-password">현재 비밀번호</label><input id="current-password" type="password" autocomplete="current-password" required>' : ''}<label for="new-password">신규 비밀번호</label><input id="new-password" type="password" autocomplete="new-password" minlength="8" required><label for="confirm-password">비밀번호 확인</label><input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required><div class="actions"><a href="./index.html">취소</a><button class="primary" id="password-save" type="submit">${mode === 'recovery' ? '등록저장' : '변경저장'}</button></div></form>`)
   document.querySelector('#password-form').addEventListener('submit', async e => {
@@ -61,7 +96,7 @@ function setPassword(mode) {
       const { error: signOutError } = await client.auth.signOut()
       if (signOutError) console.error('Password sign out:', signOutError)
       window.alert('비밀번호가 정상적으로 저장되었습니다.\n새 비밀번호로 다시 로그인하십시오.')
-      window.location.replace('./index.html')
+      await returnToPortal()
     } catch (err) { console.error('Password update:', err); message('비밀번호 저장에 실패했습니다. 인증 상태를 확인하십시오.', true) }
     finally { button.disabled = false }
   })
