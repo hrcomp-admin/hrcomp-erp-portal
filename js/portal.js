@@ -37,6 +37,10 @@ function updateMode() {
 window.addEventListener('resize', updateMode)
 updateMode()
 
+function emailFallbackEnabled() {
+  return new URLSearchParams(location.search).get('login') === 'email'
+}
+
 function showLogin(message = '') {
   authenticated = false
   root.replaceChildren()
@@ -50,8 +54,8 @@ function showLogin(message = '') {
       <h2>WEB ERP 로그인</h2>
       <p>등록된 사용자 계정으로 로그인하십시오.</p>
       <form id="login-form">
-        <label for="login-email">이메일</label>
-        <input id="login-email" type="email" autocomplete="username" required>
+        <label for="login-id">${emailFallbackEnabled() ? '이메일 (검증용)' : '사번'}</label>
+        <input id="login-id" type="${emailFallbackEnabled() ? 'email' : 'text'}" autocomplete="username" ${emailFallbackEnabled() ? '' : 'maxlength="20" autocapitalize="characters"'} required>
         <label for="login-password">비밀번호</label>
         <input id="login-password" type="password" autocomplete="current-password" required>
         <button type="submit" id="login-button">로그인</button>
@@ -67,10 +71,30 @@ function showLogin(message = '') {
     button.disabled = true
     feedback.textContent = ''
     try {
-      const email = document.querySelector('#login-email').value.trim()
+      const loginId = document.querySelector('#login-id').value.trim()
       const password = document.querySelector('#login-password').value
-      const { error } = await client.auth.signInWithPassword({ email, password })
-      if (error) throw error
+      if (emailFallbackEnabled()) {
+        const { error } = await client.auth.signInWithPassword({ email: loginId, password })
+        if (error) throw error
+      } else {
+        if (!/^HR[0-9]{3,}$/i.test(loginId)) throw new Error('사번 형식 오류')
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/employee-login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({ emp_no: loginId.toUpperCase(), password })
+        })
+        if (!response.ok) throw new Error(`사번 인증 실패 (${response.status})`)
+        const result = await response.json()
+        if (!result.access_token || !result.refresh_token) throw new Error('인증 세션 누락')
+        const { error } = await client.auth.setSession({
+          access_token: result.access_token,
+          refresh_token: result.refresh_token
+        })
+        if (error) throw error
+      }
       await loadPortal()
     } catch (error) {
       feedback.textContent = '로그인 또는 메뉴 조회에 실패했습니다. 계정과 권한을 확인하십시오.'
@@ -143,7 +167,7 @@ async function loadPortal() {
   authPanel.hidden = true
   document.querySelector('#portal-content').hidden = false
   logoutButton.hidden = false
-  userLabel.textContent = user.email || ''
+  userLabel.textContent = '' // 이메일을 로그인 화면/포털 헤더에 노출하지 않습니다.
   renderMenus(data || [])
 }
 
