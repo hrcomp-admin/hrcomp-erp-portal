@@ -48,6 +48,7 @@ function setPassword(mode) {
     const confirm = document.querySelector('#confirm-password').value
     if (password.length < 8 || /\s/.test(password)) { message('비밀번호는 8자 이상이며 공백을 포함할 수 없습니다.', true); return }
     if (password !== confirm) { message('새 비밀번호와 확인값이 일치하지 않습니다.', true); return }
+    if (!window.confirm('비밀번호를 실제로 저장하시겠습니까?')) return
     button.disabled = true
     try {
       if (mode === 'change') {
@@ -58,7 +59,6 @@ function setPassword(mode) {
         const { error: signError } = await client.auth.signInWithPassword({ email: user.email, password: current })
         if (signError) { message('현재 비밀번호가 일치하지 않습니다.', true); return }
       } else if (!recovery) throw new Error('이메일 인증이 필요합니다.')
-      if (!window.confirm('비밀번호를 실제로 저장하시겠습니까?')) return
       const { error } = await client.auth.updateUser({ password })
       if (error) throw error
       document.querySelector('#password-form').reset()

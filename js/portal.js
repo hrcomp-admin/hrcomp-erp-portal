@@ -21,6 +21,7 @@ const root = document.querySelector('#groups')
 const authPanel = document.querySelector('#auth-panel')
 const status = document.querySelector('#portal-status')
 const logoutButton = document.querySelector('#logout-button')
+const passwordChangeButton = document.querySelector('#password-change-button')
 const userLabel = document.querySelector('#user-label')
 const openedTabs = new Map()
 let client
@@ -46,6 +47,7 @@ function showLogin(message = '') {
   root.replaceChildren()
   document.querySelector('#portal-content').hidden = true
   logoutButton.hidden = true
+  passwordChangeButton.hidden = true
   userLabel.textContent = ''
   authPanel.hidden = false
   authPanel.innerHTML = `
@@ -167,6 +169,7 @@ async function loadPortal() {
   authPanel.hidden = true
   document.querySelector('#portal-content').hidden = false
   logoutButton.hidden = false
+  passwordChangeButton.hidden = false
   // 인증된 Auth 사용자와 연결된 사원만 표시합니다. 이메일은 노출하지 않습니다.
   userLabel.textContent = ''
   const { data: employee, error: employeeError } = await client
@@ -182,6 +185,14 @@ async function loadPortal() {
   }
   renderMenus(data || [])
 }
+
+passwordChangeButton.addEventListener('click', () => {
+  if (!authenticated) { showLogin('로그인이 필요합니다.'); return }
+  const url = new URL('./password.html?mode=change', location.href)
+  const tab = window.open(url.href, 'hrcomp_erp_password_change')
+  if (tab) { openedTabs.set('hrcomp_erp_password_change', tab); tab.focus() }
+  else setStatus('팝업이 차단되었습니다. 브라우저의 새 탭 허용 설정을 확인하십시오.', true)
+})
 
 logoutButton.addEventListener('click', async () => {
   logoutButton.disabled = true
