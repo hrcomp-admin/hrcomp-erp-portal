@@ -31,3 +31,14 @@
 
 /* 비밀번호 변경 완료 시 상단 포털 링크 숨김 */
 #password-portal-link[hidden] { display: none !important; }
+
+/* 계정관리 상단: 텍스트형 비밀번호 변경 / 독립 로그아웃 버튼 */
+.top-right #password-change-button{appearance:none;-webkit-appearance:none;background:transparent;border:0;box-shadow:none;border-radius:0;color:#fff;font:inherit;font-size:13px;padding:5px 0;margin:0;cursor:pointer;white-space:nowrap}
+.top-right #password-change-button:hover{text-decoration:underline}
+.top-right #password-change-button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.top-right #user-label{white-space:nowrap}
+.top-right #user-label:not(:empty)::after{content:'│';display:inline-block;margin-left:12px;color:#a8c0d3}
+.top-right #logout-button{margin-left:12px}
+/* 비밀번호 완료 안내 문구 강조 */
+.password-card .password-close-notice{font-size:18px;font-weight:700;color:#173a5c;line-height:1.5;margin:20px 0 16px}
+@media(max-width:700px){.top-right #password-change-button{font-size:12px}.top-right #logout-button{margin-left:8px}.password-card .password-close-notice{font-size:17px}}
