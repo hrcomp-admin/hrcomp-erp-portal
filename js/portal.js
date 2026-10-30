@@ -31,8 +31,8 @@ function setStatus(message, isError = false) {
   status.classList.toggle('error', isError)
 }
 function updateMode() {
-  document.querySelector('#mode').textContent = window.matchMedia('(max-width: 700px)').matches
-    ? '모바일 · 새 탭 열기' : 'PC · 새 탭 열기'
+  const mode = document.querySelector('#mode')
+  if (mode) mode.textContent = ''
 }
 window.addEventListener('resize', updateMode)
 updateMode()
@@ -167,7 +167,19 @@ async function loadPortal() {
   authPanel.hidden = true
   document.querySelector('#portal-content').hidden = false
   logoutButton.hidden = false
-  userLabel.textContent = '' // 이메일을 로그인 화면/포털 헤더에 노출하지 않습니다.
+  // 인증된 Auth 사용자와 연결된 사원만 표시합니다. 이메일은 노출하지 않습니다.
+  userLabel.textContent = ''
+  const { data: employee, error: employeeError } = await client
+    .from('md_employee')
+    .select('emp_no, emp_name')
+    .eq('auth_user_id', user.id)
+    .eq('active_yn', 'Y')
+    .maybeSingle()
+  if (employeeError) {
+    console.warn('Portal employee label:', employeeError.message)
+  } else if (employee) {
+    userLabel.textContent = [employee.emp_no, employee.emp_name].filter(Boolean).join('-')
+  }
   renderMenus(data || [])
 }
 
