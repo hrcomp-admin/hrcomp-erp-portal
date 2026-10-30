@@ -28,3 +28,6 @@
 .password-card .actions button:disabled{opacity:.5;cursor:not-allowed}
 .password-card .message{font-size:13px;line-height:1.6;min-height:20px;margin-top:14px;color:#245f9e;overflow-wrap:anywhere}
 .password-card .message.error{color:#b02a2a}
+
+/* 비밀번호 변경 완료 시 상단 포털 링크 숨김 */
+#password-portal-link[hidden] { display: none !important; }
