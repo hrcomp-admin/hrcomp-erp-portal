@@ -36,7 +36,13 @@ function resetRequest() {
       const redirectTo = new URL('./password.html', location.href).href
       const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo })
       if (error) throw error
-      message('계정이 등록되어 있고 메일 발송이 허용된 경우 인증 메일이 발송됩니다. 이 비밀번호관리 탭을 닫고, 메일의 인증 링크를 열어 새 비밀번호를 등록하십시오. 기존 WEB ERP 로그인 탭은 그대로 유지됩니다.')
+      // 메일 요청이 성공적으로 접수되면 중간 요청 화면을 남기지 않습니다.
+      // 브라우저가 스크립트에 의한 탭 종료를 허용하지 않으면 로그인 화면으로 대체합니다.
+      message('인증 메일 요청이 접수되었습니다. 로그인 화면으로 돌아갑니다.')
+      window.close()
+      setTimeout(() => {
+        if (!window.closed) window.location.replace(new URL('./index.html', location.href).href)
+      }, 350)
     } catch (err) {
       console.error('Password reset request:', err)
       message('메일 발송 요청을 처리하지 못했습니다. 잠시 후 다시 시도하십시오.', true)
