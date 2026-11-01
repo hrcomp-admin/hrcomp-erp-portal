@@ -36,7 +36,7 @@ function resetRequest() {
       const redirectTo = new URL('./password.html', location.href).href
       const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo })
       if (error) throw error
-      message('계정이 등록되어 있고 메일 발송이 허용된 경우 인증 메일이 발송됩니다. 받은 편지함을 확인하십시오.')
+      message('계정이 등록되어 있고 메일 발송이 허용된 경우 인증 메일이 발송됩니다. 이 비밀번호관리 탭을 닫고, 메일의 인증 링크를 열어 새 비밀번호를 등록하십시오. 기존 WEB ERP 로그인 탭은 그대로 유지됩니다.')
     } catch (err) {
       console.error('Password reset request:', err)
       message('메일 발송 요청을 처리하지 못했습니다. 잠시 후 다시 시도하십시오.', true)
