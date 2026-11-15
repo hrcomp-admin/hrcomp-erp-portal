@@ -111,7 +111,7 @@ function renderMenus(rows) {
   root.replaceChildren()
   const grouped = new Map()
   for (const row of rows) {
-    if (!row.web_url || !row.web_group) continue
+    if (!row.web_group || !row.web_url) continue
     if (!grouped.has(row.web_group)) grouped.set(row.web_group, [])
     grouped.get(row.web_group).push(row)
   }
@@ -132,16 +132,18 @@ function renderMenus(rows) {
     for (const row of grouped.get(groupName).sort((a,b) => (a.web_sort_order ?? 999) - (b.web_sort_order ?? 999) || a.menu_id - b.menu_id)) {
       const el = document.createElement('button')
       el.type = 'button'
-      el.className = 'item active'
-      el.setAttribute('aria-label', `${row.menu_name} 실행`)
+      const enabled = row.web_enabled_yn === 'Y'
+      el.className = enabled ? 'item active' : 'item disabled'
+      el.disabled = !enabled
+      el.setAttribute('aria-label', enabled ? `${row.menu_name} 실행` : `${row.menu_name} 준비 중`)
       const label = document.createElement('span')
       label.className = 'item-label'
       label.textContent = row.menu_name
       const state = document.createElement('span')
       state.className = 'status'
-      state.textContent = '열기 ↗'
+      state.textContent = enabled ? '열기 ↗' : '준비 중'
       el.append(label, state)
-      el.addEventListener('click', () => {
+      if (enabled) el.addEventListener('click', () => {
         if (!authenticated) { showLogin('로그인 세션이 종료되었습니다.'); return }
         // DB URL은 개발자가 등록한 신뢰된 HTTPS 주소만 실행합니다.
         let url
@@ -183,6 +185,7 @@ async function loadPortal() {
   } else if (employee) {
     userLabel.textContent = [employee.emp_no, employee.emp_name].filter(Boolean).join('-')
   }
+  // RPC 결과에 WEB 전용 활성화 컬럼이 없으면 잘못된 실행을 막기 위해 비활성으로 표시합니다.
   renderMenus(data || [])
 }
 
