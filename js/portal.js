@@ -157,7 +157,7 @@ function renderMenus(rows) {
     section.append(list)
     root.append(section)
   }
-  setStatus(rows.length ? `사용 가능한 WEB 업무 메뉴 ${rows.length}개` : '접근 가능한 WEB 업무 메뉴가 없습니다.')
+  setStatus(rows.length ? '' : '접근 가능한 WEB 업무 메뉴가 없습니다.')
 }
 
 async function loadPortal() {
